@@ -43,7 +43,7 @@ alias pscpu10='ps -e -o pcpu,cpu,nice,state,cputime,args|sort -k1 -nr | head -10
 alias hist10='print -l ${(o)history%% *} | uniq -c | sort -nr | head -n 10'
 
 # directory LS
-dls () {
+ldir() {
     ls -l | grep "^d" | awk '{ print $9 }' | tr -d "/"
 }
 psgrep() {
