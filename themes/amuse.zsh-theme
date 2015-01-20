@@ -1,5 +1,10 @@
-# vim:ft=zsh ts=2 sw=2 sts=2
+function {
+    if [[ -n "$SSH_CLIENT" ]]; then
+        PROMPT_HOST=" ($HOST)"
+    else
+        PROMPT_HOST=''
+    fi
+}
 
-PROMPT='%n:%{$fg_bold[cyan]%}%c%{$reset_color%}$(git_super_status) → '
-
-RPROMPT=''
+# Ξ ⛄ 🙣 🙙 ⛇ ⛏ ⛱ ⛺ ⎰ 𝔉 𝔊 𝔈 ℌ 𝔍 𝔓 𝔗 𝝍 ℥
+PROMPT='%{$fg_bold[green]%}⛱ %{$fg[blue]%}${PROMPT_HOST}%{$fg_bold[green]%}%p %{$fg_no_bold[yellow]%}%2~%{$reset_color%}$(git_super_status) → '
