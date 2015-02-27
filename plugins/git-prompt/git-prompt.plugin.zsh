@@ -65,7 +65,7 @@ function update_current_git_vars() {
 git_super_status() {
     precmd_update_git_vars
     if [ -n "$__CURRENT_GIT_STATUS" ]; then
-      STATUS=" %{$fg_bold[yellow]%}⚡%{$fg_bold[magenta]%} $GIT_BRANCH%{${reset_color}%}"
+      STATUS=" %{$fg_no_bold[yellow]%}⚡%{$fg_no_bold[magenta]%} $GIT_BRANCH%{${reset_color}%}"
       if [ "$GIT_BEHIND" -ne "0" ]; then
           STATUS="$STATUS %{↓%G%}$GIT_BEHIND%{${reset_color}%}"
       fi
@@ -86,7 +86,7 @@ git_super_status() {
           STATUS="$STATUS %{…%G%}%{${reset_color}%}"
       fi
       if [ "$GIT_CHANGED" -eq "0" ] && [ "$GIT_CONFLICTS" -eq "0" ] && [ "$GIT_STAGED" -eq "0" ] && [ "$GIT_UNTRACKED" -eq "0" ]; then
-          STATUS="$STATUS %{$fg_bold[green]%}%{✔%G%}"
+          STATUS="$STATUS %{$fg_no_bold[green]%}%{✔%G%}"
       fi
       STATUS="$STATUS%{${reset_color}%}"
       echo "$STATUS"
