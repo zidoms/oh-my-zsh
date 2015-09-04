@@ -1,26 +1,13 @@
-# To install source this file from your .zshrc file
+# ZSH Git Prompt Plugin from:
+# http://github.com/olivierverdier/zsh-git-prompt
 
-# see documentation at http://linux.die.net/man/1/zshexpn
-# A: finds the absolute path, even if this is symlinked
-# h: equivalent to dirname
-export __GIT_PROMPT_DIR=${0:A:h}
+__GIT_PROMPT_DIR="${0:A:h}"
 
-export GIT_PROMPT_EXECUTABLE=${GIT_PROMPT_USE_PYTHON:-"python"}
+## Hook function definitions
+function chpwd_update_git_vars() {
+    update_current_git_vars
+}
 
-# Initialize colors.
-autoload -U colors
-colors
-
-# Allow for functions in the prompt.
-setopt PROMPT_SUBST
-
-autoload -U add-zsh-hook
-
-add-zsh-hook chpwd chpwd_update_git_vars
-add-zsh-hook preexec preexec_update_git_vars
-add-zsh-hook precmd precmd_update_git_vars
-
-## Function definitions
 function preexec_update_git_vars() {
     case "$2" in
         git*|hub*|gh*|stg*)
@@ -36,22 +23,18 @@ function precmd_update_git_vars() {
     fi
 }
 
-function chpwd_update_git_vars() {
-    update_current_git_vars
-}
+chpwd_functions+=(chpwd_update_git_vars)
+precmd_functions+=(precmd_update_git_vars)
+preexec_functions+=(preexec_update_git_vars)
 
+
+## Function definitions
 function update_current_git_vars() {
     unset __CURRENT_GIT_STATUS
 
-    if [[ "$GIT_PROMPT_EXECUTABLE" == "python" ]]; then
-        local gitstatus="$__GIT_PROMPT_DIR/gitstatus.py"
-        _GIT_STATUS=`python ${gitstatus} 2>/dev/null`
-    fi
-    if [[ "$GIT_PROMPT_EXECUTABLE" == "haskell" ]]; then
-        local gitstatus="$__GIT_PROMPT_DIR/dist/build/gitstatus/gitstatus"
-        _GIT_STATUS=`${gitstatus}`
-    fi
-    __CURRENT_GIT_STATUS=("${(@f)_GIT_STATUS}")
+    local gitstatus="$__GIT_PROMPT_DIR/gitstatus.py"
+    _GIT_STATUS=$(python ${gitstatus} 2>/dev/null)
+     __CURRENT_GIT_STATUS=("${(@s: :)_GIT_STATUS}")
     GIT_BRANCH=$__CURRENT_GIT_STATUS[1]
     GIT_AHEAD=$__CURRENT_GIT_STATUS[2]
     GIT_BEHIND=$__CURRENT_GIT_STATUS[3]
@@ -60,7 +43,6 @@ function update_current_git_vars() {
     GIT_CHANGED=$__CURRENT_GIT_STATUS[6]
     GIT_UNTRACKED=$__CURRENT_GIT_STATUS[7]
 }
-
 
 git_super_status() {
     precmd_update_git_vars
