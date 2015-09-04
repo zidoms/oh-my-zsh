@@ -80,7 +80,7 @@ git_super_status() {
           STATUS="$STATUS %{$fg[red]%}%{✖%G%}$GIT_CONFLICTS%{${reset_color}%}"
       fi
       if [ "$GIT_CHANGED" -ne "0" ]; then
-          STATUS="$STATUS %{$fg[blue]%}%{✚%G%}$GIT_CHANGED%{${reset_color}%}"
+          STATUS="$STATUS %{$fg[cyan]%}%{✚%G%}$GIT_CHANGED%{${reset_color}%}"
       fi
       if [ "$GIT_UNTRACKED" -ne "0" ]; then
           STATUS="$STATUS %{…%G%}%{${reset_color}%}"
