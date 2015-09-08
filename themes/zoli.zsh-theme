@@ -5,5 +5,5 @@ _random_icon() {
 	echo $_icons[$dayindex%$#_icons+1]
 }
 
-PROMPT='%{$fg_bold[green]%}$(_random_icon)%b $FG[229]%n@%m %{$fg_no_bold[blue]%}%2~%{$reset_color%}$(git_super_status)
+PROMPT='%{$fg_bold[green]%}$(_random_icon)%b %{$fg_no_bold[blue]%}%n@%m $FG[186]%2~%{$reset_color%}$(git_super_status)
  → '
