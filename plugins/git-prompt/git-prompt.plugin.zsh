@@ -56,10 +56,10 @@ git_super_status() {
       fi
       STATUS="$STATUS"
       if [ "$GIT_STAGED" -ne "0" ]; then
-          STATUS="$STATUS %{$fg[red]%}%{●%G%}$GIT_STAGED%{${reset_color}%}"
+          STATUS="$STATUS $FG[160]%{●%G%}$GIT_STAGED%{${reset_color}%}"
       fi
       if [ "$GIT_CONFLICTS" -ne "0" ]; then
-          STATUS="$STATUS %{$fg[red]%}%{✖%G%}$GIT_CONFLICTS%{${reset_color}%}"
+          STATUS="$STATUS $FG[160]%{✖%G%}$GIT_CONFLICTS%{${reset_color}%}"
       fi
       if [ "$GIT_CHANGED" -ne "0" ]; then
           STATUS="$STATUS %{$fg[cyan]%}%{✚%G%}$GIT_CHANGED%{${reset_color}%}"
