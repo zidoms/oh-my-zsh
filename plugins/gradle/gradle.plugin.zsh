@@ -60,6 +60,54 @@ _gradle_does_task_list_need_generating () {
   [[ ! -f .gradletasknamecache ]] || [[ build.gradle -nt .gradletasknamecache ]]
 }
 
+##############
+# Parse the tasks from `gradle(w) tasks --all` and return them to the calling function.
+# All lines in the output from gradle(w) that are between /^-+$/ and /^\s*$/
+# are considered to be tasks. If and when gradle adds support for listing tasks
+# for programmatic parsing, this method can be deprecated.
+##############
+_gradle_parse_tasks () {
+  lines_might_be_tasks=false
+  task_name_buffer=""
+  while read -r line; do
+    if [[ $line =~ ^-+$ ]]; then
+      lines_might_be_tasks=true
+      # Empty buffer, because it contains items that are not tasks
+      task_name_buffer=""
+    elif [[ $line =~ ^\s*$ ]]; then
+      if [[ "$lines_might_be_tasks" = true ]]; then
+        # If a newline is found, echo the buffer to the calling function
+        while read -r task; do
+          echo $task | awk '/[a-zA-Z0-9:-]+/ {print $1}'
+        done <<< "$task_name_buffer"
+        # Empty buffer, because we are done with the tasks
+        task_name_buffer=""
+      fi
+      lines_might_be_tasks=false
+    elif [[ "$lines_might_be_tasks" = true ]]; then
+      task_name_buffer="${task_name_buffer}\n${line}"
+    fi
+  done <<< "$1"
+}
+
+
+##############
+# Gradle tasks from subprojects are allowed to be executed without specifying
+# the subproject; that task will then be called on all subprojects.
+# gradle(w) tasks --all only lists tasks per subproject, but when autocompleting
+# we often want to be able to run a specific task on all subprojects, e.g.
+# "gradle clean".
+# This function uses the list of tasks from "gradle tasks --all", and for each
+# line grabs everything after the last ":" and combines that output with the original
+# output. The combined list is returned as the result of this function.
+##############
+_gradle_parse_and_extract_tasks () {
+  # All tasks
+  tasks=$(_gradle_parse_tasks "$1")
+  # Task name without sub project(s) prefix
+  simple_tasks=$(echo $tasks | awk 'BEGIN { FS = ":" } { print $NF }')
+  echo "$tasks\n$simple_tasks"
+}
 
 ##############################################################################
 # Discover the gradle tasks by running "gradle tasks --all"
@@ -68,7 +116,7 @@ _gradle_tasks () {
   if [[ -f build.gradle ]]; then
     _gradle_arguments
     if _gradle_does_task_list_need_generating; then
-      gradle tasks --all | awk '/[a-zA-Z0-9:-]* - / {print $1}' > .gradletasknamecache
+      _gradle_parse_and_extract_tasks "$(gradle tasks --all)" > .gradletasknamecache
     fi
     compadd -X "==== Gradle Tasks ====" $(cat .gradletasknamecache)
   fi
@@ -78,7 +126,7 @@ _gradlew_tasks () {
   if [[ -f build.gradle ]]; then
     _gradle_arguments
     if _gradle_does_task_list_need_generating; then
-      ./gradlew tasks --all | awk '/[a-zA-Z0-9:-]* - / {print $1}' > .gradletasknamecache
+      _gradle_parse_and_extract_tasks "$(./gradlew tasks --all)" > .gradletasknamecache
     fi
     compadd -X "==== Gradlew Tasks ====" $(cat .gradletasknamecache)
   fi
